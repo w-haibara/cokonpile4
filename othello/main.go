@@ -17,8 +17,10 @@ type table []square
 
 var gameSet = fmt.Errorf("game set")
 
+const size = 10
+
 func main() {
-	tmp := make([]square, 17)
+	tmp := make([]square, size)
 	t := table(tmp)
 	r := bufio.NewReader(os.Stdin)
 
@@ -37,7 +39,7 @@ func main() {
 
 			t.print(os.Stdout)
 
-			if err := t.check(os.Stdout, 17); err != nil {
+			if err := t.check(os.Stdout, size); err != nil {
 				if err == gameSet {
 					os.Exit(0)
 				}
@@ -61,7 +63,7 @@ func main() {
 			}
 
 			t.print(os.Stdout)
-			if err := t.check(os.Stdout, 17); err != nil {
+			if err := t.check(os.Stdout, size); err != nil {
 				if err == gameSet {
 					os.Exit(0)
 				}
