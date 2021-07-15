@@ -15,8 +15,10 @@ type square struct {
 
 type table []square
 
+var gameSet = fmt.Errorf("game set")
+
 func main() {
-	tmp := make([]square, 10)
+	tmp := make([]square, 17)
 	t := table(tmp)
 	r := bufio.NewReader(os.Stdin)
 
@@ -34,6 +36,15 @@ func main() {
 			}
 
 			t.print(os.Stdout)
+
+			if err := t.check(os.Stdout, 17); err != nil {
+				if err == gameSet {
+					os.Exit(0)
+				}
+				fmt.Println("check error:", err.Error())
+				os.Exit(1)
+			}
+
 			break
 		}
 
@@ -50,33 +61,45 @@ func main() {
 			}
 
 			t.print(os.Stdout)
+			if err := t.check(os.Stdout, 17); err != nil {
+				if err == gameSet {
+					os.Exit(0)
+				}
+				fmt.Println("check error:", err.Error())
+				os.Exit(1)
+			}
+
 			break
 		}
+	}
+}
 
-		w := 0
-		b := 0
-		for _, v := range t {
-			if v.w {
-				w++
-			}
-			if v.b {
-				b++
-			}
+func (t *table) check(w io.Writer, size int) error {
+	wn := 0
+	bn := 0
+	for _, v := range *t {
+		if v.w {
+			wn++
 		}
-		if w+b == 10 {
-			fmt.Println("=== game set ===")
-			fmt.Println("white:", w, ", black:", b)
-			switch {
-			case w == b:
-				fmt.Println("draw game")
-			case w > b:
-				fmt.Println("white player win!")
-			case w < b:
-				fmt.Println("black player win!")
-			}
-			os.Exit(0)
+		if v.b {
+			bn++
 		}
 	}
+	if wn+bn == size {
+		fmt.Fprintln(w, "=== game set ===")
+		fmt.Fprintln(w, "white:", wn, ", black:", bn)
+		switch {
+		case wn == bn:
+			fmt.Fprintln(w, "draw game")
+		case wn > bn:
+			fmt.Fprintln(w, "white player win!")
+		case wn < bn:
+			fmt.Fprintln(w, "black player win!")
+		}
+		return gameSet
+	}
+
+	return nil
 }
 
 func read(w io.Writer, r *bufio.Reader, player string) (int, error) {
